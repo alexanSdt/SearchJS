@@ -857,7 +857,14 @@ var ResultRenderer = function(map, sInitImagesHost, bInitAutoCenter){
 	var bAutoCenter = (bInitAutoCenter == null) || bInitAutoCenter;
 
 	var arrContainer = [];
-	var counts = [];
+	var counts = [];	
+		
+	this.eraseMarkers = function(){	
+		for (var i=0; i<arrContainer.length; ++i){
+            map.removeLayer(arrContainer[i]);
+            delete arrContainer[i];
+		}
+	}
 
 	/** возвращает стили найденных объектов, используется только для точки*/
 	var getSearchIcon = function(iPosition) {
@@ -1070,6 +1077,10 @@ var ResultListMapGet = function(oInitContainer, oInitMap, sImagesHost, bInitAuto
 	var oRenderer = new ResultRenderer(oInitMap, sImagesHost, bInitAutoCenter);
 	var lstResult = new ResultList(oInitContainer, sImagesHost);
 	ResultListMap.call(this, lstResult, oRenderer);
+	
+	this.eraseMarkers = function(){	
+		oRenderer.eraseMarkers();
+	}
 }
 
 ResultListMapGet.prototype = ResultListMap;
