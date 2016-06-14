@@ -1998,6 +1998,10 @@ var SearchControl = function(oInitInput, oInitResultListMap, oInitLogic, oInitLo
     @param {function} hook - хук, который нужно удалить
 	*/
     this.removeSearchByStringHook = function(hook) {
+		if (arguments.length==0){
+			searchByStringHooks = [];
+			return;
+		}		
         for (var h = 0; h < searchByStringHooks.length; h++) {
             if (searchByStringHooks[h].hook === hook) {
                 searchByStringHooks.splice(h, 1);
