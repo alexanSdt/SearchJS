@@ -390,4 +390,4 @@ var gmxCore = function()
     return publicInterface;
 }();
 
-window.gmxCore = window.gmxCore || {};
+window.gmxCore = window.gmxCore || gmxCore;

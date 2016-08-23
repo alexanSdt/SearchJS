@@ -390,7 +390,7 @@ var gmxCore = function()
     return publicInterface;
 }();
 
-window.gmxCore = window.gmxCore || {};
+window.gmxCore = window.gmxCore || gmxCore;
 
 var nsGmx = nsGmx || {};
 nsGmx.Utils = nsGmx.Utils || {};
