@@ -1,5 +1,6 @@
 {
   "name": "gmx-AuthWidget",
+  "main": "dist/search.js",
   "devDependencies": {
     "gulp": "3.8.10",
     "gulp-concat": "2.4.2"
