@@ -595,6 +595,7 @@ function strip(s)
 
 (function() {
     var replacements = {};
+    var temp;
     for (var rus in (temp = {
         "qwertyuiopasdfghjklzxcvbnm_1234567890" :
         "qwertyuiopasdfghjklzxcvbnm_1234567890",
