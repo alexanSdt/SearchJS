@@ -291,7 +291,7 @@ var SearchInput = function (oInitContainer, params) {
 
 		$(function() {
 			$(searchField).autocomplete({
-				minLength: 3,
+				minLength: params.minLetters,
 				source: fnAutoCompleteSource,
 				select: fnAutoCompleteSelect,
                 appendTo: searchField.parentNode
@@ -310,9 +310,13 @@ var SearchInput = function (oInitContainer, params) {
                         });
                     }
                 }
+                var icon = "";
+                if (item.iconClass) {
+                    icon = '<div style="float:left" class="' + item.iconClass + '"></div>';
+                }
                 return $( "<li></li>" )
                     .data( "item.autocomplete", item )
-                    .append( "<a>" + t + "</a>" )
+                    .append(icon + "<a>" + t + "</a>")
                     .appendTo( ul );
             };
 		});
@@ -1724,7 +1728,7 @@ var SearchLogic = function(oInitSearchDataProvider, WithoutGeometry, params){
 *  * Map - карта, на которой будут рисоваться объекты
 *  * gmxMap - карта с векторными слоями
 *  * WithoutGeometry - не передавать геометрию в результатах поиска
-*
+*  * minLetters - минимальное кол-во символов для поиска. 3 - по умолчанию
 * @returns {Search.SearchControl}
 */
 var SearchControlGet = function (params){
@@ -1739,7 +1743,8 @@ var SearchControlGet = function (params){
 	var btnSearch = new SearchInput(params.ContainerInput, {
 		ImagesHost: params.ImagesHost,
 		layersSearchFlag: params.layersSearchFlag,
-		AutoCompleteSource: fnAutoCompleteSource
+		AutoCompleteSource: fnAutoCompleteSource,
+        minLetters: params.minLetters || 3
 	});
     var oLocationTitleRenderer = new LocationTitleRenderer(map, typeof (gmxGeoCodeShowNearest) != "undefined" && gmxGeoCodeShowNearest ? oLogic.SearchNearest:oLogic.SearchLocation);
 	SearchControl.call(this, btnSearch, lstResult, oLogic, oLocationTitleRenderer);
