@@ -2648,7 +2648,7 @@ var SearchInput = function (oInitContainer, params) {
 
 		$(function() {
 			$(searchField).autocomplete({
-				minLength: 3,
+				minLength: params.minLetters,
 				source: fnAutoCompleteSource,
 				select: fnAutoCompleteSelect,
                 appendTo: searchField.parentNode
@@ -2667,9 +2667,13 @@ var SearchInput = function (oInitContainer, params) {
                         });
                     }
                 }
+                var icon = "";
+                if (item.iconClass) {
+                    icon = '<div style="float:left" class="' + item.iconClass + '"></div>';
+                }
                 return $( "<li></li>" )
                     .data( "item.autocomplete", item )
-                    .append( "<a>" + t + "</a>" )
+                    .append(icon + "<a>" + t + "</a>")
                     .appendTo( ul );
             };
 		});
@@ -3070,7 +3074,7 @@ var ResultList = function(oInitContainer, ImagesHost){
             return b;
         }
 
-        containerList = Container;
+        var containerList = Container;
         $('#respager').remove();
         //var pager = _div([_t('всего: ' + results[0].ResultsCount)], [["attr", "id", "respager"]]);
         var pager = _div([_t('')], [["attr", "id", "respager"]]);
@@ -3214,8 +3218,8 @@ var ResultRenderer = function(map, sInitImagesHost, bInitAutoCenter){
 	var bAutoCenter = (bInitAutoCenter == null) || bInitAutoCenter;
 
 	var arrContainer = [];
-	var counts = [];	
-		
+	var counts = [];
+
 	this.eraseMarkers = function(){
 			for (var i=0; i<arrContainer.length; ++i)
 				if (arrContainer[i]){
@@ -3341,7 +3345,7 @@ var ResultRenderer = function(map, sInitImagesHost, bInitAutoCenter){
 
 	/** Рисует объекты на карте.
 	@param {int} iDataSourceN № источника данных (группы результатов поиска)
-	@param {Array} arrFoundObjects Массив объектов для отрисовки. Каждый объект имеет свойства 
+	@param {Array} arrFoundObjects Массив объектов для отрисовки. Каждый объект имеет свойства
 	@param {bool} [options.append=false] Добавить к существующим объектам для источника данных, а не удалять их
 	@return {Array} Нарисованные на карте объекты: массив хешей с полями center и boundary
     */
@@ -3358,7 +3362,7 @@ var ResultRenderer = function(map, sInitImagesHost, bInitAutoCenter){
             counts[iDataSourceN] = 0;
         }
 
-		iCount = arrFoundObjects.length;
+		var iCount = arrFoundObjects.length;
 
         var mapObjects = [];
 
@@ -3424,7 +3428,7 @@ var LocationTitleRenderer = function(oInitMap, fnSearchLocation){
 	if (oMap.coordinates) oMap.coordinates.addCoordinatesFormat(setLocationTitleDiv);
 }
 
-/** Возвращает контрол, отображающий результаты поиска в виде списка с нанесением на карту 
+/** Возвращает контрол, отображающий результаты поиска в виде списка с нанесением на карту
  @memberof Search
  @param {object} oInitContainer Объект, в котором находится контрол результатов поиска в виде списка(div)
  @param {object} oInitMap карта, на которой будут рисоваться объекты
@@ -3435,8 +3439,8 @@ var ResultListMapGet = function(oInitContainer, oInitMap, sImagesHost, bInitAuto
 	var oRenderer = new ResultRenderer(oInitMap, sImagesHost, bInitAutoCenter);
 	var lstResult = new ResultList(oInitContainer, sImagesHost);
 	ResultListMap.call(this, lstResult, oRenderer);
-	
-	this.eraseMarkers = function(){	
+
+	this.eraseMarkers = function(){
 		oRenderer.eraseMarkers();
 	}
 }
@@ -3656,7 +3660,7 @@ var SearchDataProvider = function(sInitServerBase, gmxMap, arrDisplayFields){
 
             if (searchRes) {
                 var props = searchRes.elem.content.properties;
-                
+
                 if (props.type == "Vector" && props.AllowSearch && gmxMap.layers[i]._map) {
                     layersToSearch.push(props);
                 }
@@ -3706,7 +3710,7 @@ var SearchDataProvider = function(sInitServerBase, gmxMap, arrDisplayFields){
 
                                     arrLayerResult.push({
                                         ObjName: req.SearchResult[j].properties.NAME || req.SearchResult[j].properties.Name || req.SearchResult[j].properties.name || req.SearchResult[j].properties.text || req.SearchResult[j].properties["Название"] || "[объект]",
-                                        properties: arrDisplayProperties, 
+                                        properties: arrDisplayProperties,
                                         Geometry: L.gmxUtil.convertGeometry(req.SearchResult[j].geometry, true)
                                     });
                                 }
@@ -3733,9 +3737,9 @@ var SearchDataProvider = function(sInitServerBase, gmxMap, arrDisplayFields){
 	}
 }
 
-/** Cинхронное последовательное обращение к наблюдателям 
-    @param queue {Array} очередь наблюдателей    
-*/   
+/** Cинхронное последовательное обращение к наблюдателям
+    @param queue {Array} очередь наблюдателей
+*/
 var deferredsChain = function(queue, params){
     var deferred = $.Deferred(),
     promise = $.when(deferred);
@@ -3751,10 +3755,10 @@ var deferredsChain = function(queue, params){
         }
     }
     else{
-        deferred.resolve(0);  
+        deferred.resolve(0);
     }
-    return promise;  
-}	
+    return promise;
+}
 
 /**Возращает класс, который предоставляет функции обработки найденных данных
  @memberof Search
@@ -3807,13 +3811,13 @@ var SearchLogic = function(oInitSearchDataProvider, WithoutGeometry, params){
 	}
 
 
-    /** Очередь наблюдателей за началом поиска    
+    /** Очередь наблюдателей за началом поиска
     */
     var SearchStarting = [];
 
     /** Событие в начале обработки поискового запроса (перед обращением к геокдеру)
-        @param {{add:bool, remove:bool, observer:function(next, deferred, params)}} 
-        observer возвращает $.Deferred() для асинхронной последовательной обработки, $.Deferred().resolve(next) 
+        @param {{add:bool, remove:bool, observer:function(next, deferred, params)}}
+        observer возвращает $.Deferred() для асинхронной последовательной обработки, $.Deferred().resolve(next)
         для перехода к очередному наблюдателю или $.Deferred().resolve(-1) для остановки всей обработки
     */
     this.SearchStarting = function(params){
@@ -3825,7 +3829,7 @@ var SearchLogic = function(oInitSearchDataProvider, WithoutGeometry, params){
 						SearchStarting.splice(i, 1);
 					}
 					else
-						return;        
+						return;
 			if(params.add){
 				//console.log("add observer");
 				SearchStarting.push(params.observer);
@@ -3834,8 +3838,8 @@ var SearchLogic = function(oInitSearchDataProvider, WithoutGeometry, params){
 		else
 			return SearchStarting;
     }
-	
-    /** Очередь наблюдателей за началом обработки запроса для подсказки     
+
+    /** Очередь наблюдателей за началом обработки запроса для подсказки
     */
     var AutoCompleteDataSearchStarting = [];
 
@@ -4081,7 +4085,7 @@ var SearchLogic = function(oInitSearchDataProvider, WithoutGeometry, params){
 *  * Map - карта, на которой будут рисоваться объекты
 *  * gmxMap - карта с векторными слоями
 *  * WithoutGeometry - не передавать геометрию в результатах поиска
-*
+*  * minLetters - минимальное кол-во символов для поиска. 3 - по умолчанию
 * @returns {Search.SearchControl}
 */
 var SearchControlGet = function (params){
@@ -4096,7 +4100,8 @@ var SearchControlGet = function (params){
 	var btnSearch = new SearchInput(params.ContainerInput, {
 		ImagesHost: params.ImagesHost,
 		layersSearchFlag: params.layersSearchFlag,
-		AutoCompleteSource: fnAutoCompleteSource
+		AutoCompleteSource: fnAutoCompleteSource,
+        minLetters: params.minLetters || 3
 	});
     var oLocationTitleRenderer = new LocationTitleRenderer(map, typeof (gmxGeoCodeShowNearest) != "undefined" && gmxGeoCodeShowNearest ? oLogic.SearchNearest:oLogic.SearchLocation);
 	SearchControl.call(this, btnSearch, lstResult, oLogic, oLocationTitleRenderer);
@@ -4165,7 +4170,7 @@ var SearchControl = function(oInitInput, oInitResultListMap, oInitLogic, oInitLo
 		@event*/
 		$(_this).triggerHandler('onBeforeSearch');
 	}
-	
+
 	var fnAfterSearch = function(){
 		/** Генерируется после окончания поиска
 		@name Search.SearchControl.onAfterSearch
@@ -4179,8 +4184,8 @@ var SearchControl = function(oInitInput, oInitResultListMap, oInitLogic, oInitLo
 		//try{
 	        deferredsChain(oLogic.SearchStarting(), {searchString:SearchString, lstResult: lstResult}).done(function(fin){
 				//console.log('finally ' + fin);
-				if (fin!=-1){			
-			
+				if (fin!=-1){
+
             for (var h = 0; h < searchByStringHooks.length; h++) {
                 if (searchByStringHooks[h].hook(SearchString)) {
                     return;
@@ -4207,9 +4212,9 @@ var SearchControl = function(oInitInput, oInitResultListMap, oInitLogic, oInitLo
                 });
                 fnAfterSearch();
             }});
-						
+
 				}
-			});			
+			});
 		//}
 		//catch (e){
 		//	lstResult.ShowError(e);
@@ -4319,13 +4324,13 @@ var SearchControl = function(oInitInput, oInitResultListMap, oInitLogic, oInitLo
 
     /**
     Добавление наблюдателя события начала оработки поискового запроса
-        @param {observer:{add:bool, remove:bool, observer:function(next, deferred, params)}}, selectItem:function(){}}} 
+        @param {observer:{add:bool, remove:bool, observer:function(next, deferred, params)}}, selectItem:function(){}}}
     */
     this.onSearchStarting = function(params){
         oLogic.SearchStarting(params.observer);
         //$(btnSearch).bind('AutoCompleteSelect', params.selectItem);
     }
-	
+
     /**
     Добавление наблюдателя события начала оработки запроса для подсказки
         @param {observer:{add:bool, remove:bool, observer:function(next, deferred, params)}}, selectItem:function(){}}}
@@ -4358,7 +4363,7 @@ var SearchControl = function(oInitInput, oInitResultListMap, oInitLogic, oInitLo
 		if (arguments.length==0){
 			searchByStringHooks = [];
 			return;
-		}		
+		}
         for (var h = 0; h < searchByStringHooks.length; h++) {
             if (searchByStringHooks[h].hook === hook) {
                 searchByStringHooks.splice(h, 1);
